@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Selección de Método de Pago</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<link rel="stylesheet" href="css/style.css" />
+		<script src="js/lightbox.js"></script>
+		<script src="js/crypto-js-min.js"></script>
+        
+        <!-- Libreria en sandbox -->
+		<script src="https://sbx.button.pay.synapsolutions.com/web/latest/sdk.js"></script>
+        <!-- Libreria en production -->
+		<!-- <script src="https://button.pay.synapsolutions.com/web/latest/sdk.js"></script> -->
+
+		<script>
+			function startPayment() {
+				// Seteo de los campos de transacción
+				var transaction = buildTransaction();
+
+				// Seteo de los campos de autenticación de seguridad
+				var authenticator = buildAuthentication(transaction);
+
+				// Manejo de los campos de respuesta
+				var form = new Synap.Form({
+					// Seteo del ambiente "sandbox" o "production"
+					environment: "sandbox",
+
+					// Seteo de autenticación de seguridad y transacción
+					authentication: authenticator,
+					transaction: transaction,
+
+					// Manejo de la respuesta
+					listeners: {
+						afterPay: function (response) {
+							if (response.success) {
+								if (response.result.accepted) {
+									// Agregue el código según la experiencia del cliente para la autorización
+									console.info({ ecommerceCapureResponse: response });
+									console.info("AUTHORIZED");
+								} else {
+									// Agregue el código según la experiencia del cliente para la denegación
+									console.info({ ecommerceCapureResponse: response });
+									console.info("DENIED");
+								}
+							} else {
+								// Agregue el código de la experiencia que desee visualizar en un error
+								console.info({ ecommerceCapureResponse: response });
+								console.info("ERROR");
+							}
+						},
+					},
+				});
+				// Muestre el contenedor con el widget de pago
+				form.render("#cart-container");
+			}
+
+			function buildTransaction() {
+				// Genere el número de orden, este es solo un ejemplo
+				var number = new Date().getTime() + "";
+				var selectedMethod = document.querySelector(
+					'input[name="payment-method"]:checked'
+				);
+				var paymentOption = selectedMethod.value;
+
+				// Seteo de los datos de transacción
+				var transaction = {
+					// Seteo del número de pedido
+					number: number, // Obligatorio - string(200)
+					// Seteo del código de país
+					country: "PER", // Obligatorio - "PER"
+					// Seteo del código de moneda
+					currency: "PEN", // Obligatorio - "PEN"
+					//Seteo del monto
+					amount: "1.00", // Obligatorio - float
+					// Seteo del cliente
+					customer: {
+						// Obligatorio
+						identifier: "test@test.com", // Opcional - string(200) - Identificador del cliente en el comercio
+						name: "Javier", // Obligatorio - string(200)
+						lastName: "Pérez", // Obligatorio - string(200)
+						// Seteo de datos de dirección
+						address: {
+							// Obligatorio
+							country: "PER", // Obligatorio - "PER"
+							// Códigos de área de Perú (Departamento / Provincia / Distrito)
+							levels: [
+								// Obligatorio
+								"LIMA", // Obligatorio - string(200)
+								"LIMA", // Obligatorio - string(200)
+								"SAN ISIDRO", // Obligatorio - string(200)
+							],
+							// Dirección
+							line1: "Ca Nueve 1802", // Obligatorio - string(200)
+							// Código postal
+							zip: "15036", // Obligatorio - string(200)
+						},
+						// Seteo del email y teléfono
+						email: "test@test.com", // Obligatorio - string(200)
+						phone: "999888777", // Obligatorio - string(200)
+						// Seteo del tipo y número de documento
+						document: {
+							// Obligatorio
+							type: "DNI", // Obligatorio - [DNI, CE]
+							number: "44556677", // Obligatorio - string(200)
+						},
+					},
+					// Seteo de los datos de envío
+					shipping: {
+						// Opcional
+						name: "Javier", // Obligatorio - string(200)
+						lastName: "Pérez", // Obligatorio - string(200)
+						// Seteo de datos de dirección
+						address: {
+							// Obligatorio
+							country: "PER", // Obligatorio - "PER"
+							// Códigos de área de Perú (Departamento / Provincia / Distrito)
+							levels: [
+								// Obligatorio
+								"LIMA", // Obligatorio - string(200)
+								"LIMA", // Obligatorio - string(200)
+								"SAN ISIDRO", // Obligatorio - string(200)
+							],
+							// Dirección
+							line1: "Ca Nueve 1802", // Obligatorio - string(200)
+							// Código postal
+							zip: "15036", // Obligatorio - string(200)
+						},
+						email: "test@test.com", // Obligatorio - string(200)
+						phone: "999555666", // Obligatorio - string(200)
+						document: {
+							// Obligatorio
+							type: "DNI", // Obligatorio - [DNI, CE]
+							number: "44556677", // Obligatorio - string(200)
+						},
+					},
+					// Seteo de los datos de facturación
+					billing: {
+						// Opcional
+						name: "Javier", // Obligatorio - string(200)
+						lastName: "Pérez", // Obligatorio - string(200)
+						// Seteo de datos de dirección
+						address: {
+							// Obligatorio
+							country: "PER", // Obligatorio - "PER"
+							// Códigos de área de Perú (Departamento / Provincia / Distrito)
+							levels: [
+								// Obligatorio
+								"LIMA", // Obligatorio - string(200)
+								"LIMA", // Obligatorio - string(200)
+								"SAN ISIDRO", // Obligatorio - string(200)
+							],
+							// Dirección
+							line1: "Ca Nueve 1802", // Obligatorio - string(200)
+							// Código postal
+							zip: "15036", // Obligatorio - string(200)
+						},
+						email: "test@test.com", // Obligatorio - string(200)
+						phone: "999555666", // Obligatorio - string(200)
+						document: {
+							// Obligatorio
+							type: "DNI", // Obligatorio - [DNI, CE]
+							number: "44556677", // Obligatorio - string(200)
+						},
+					},
+					// Seteo de los datos de los productos
+					products: [
+						{
+							// Obligatorio
+							code: "1020304005060", // Opcional - string(200)
+							name: "Llavero", // Obligatorio - string(200)
+							quantity: 1, // Obligatorio - integer
+							unitAmount: 10.1, // Obligatorio - float
+							amount: 10.1, // Obligatorio - float
+						},
+					],
+					// Seteo de los datos de metadata
+					metadata: [
+						{
+							// Opcional
+							Factura: "F001-01234", // Obligatorio - key(string): value(string)
+						},
+					],
+					// Seteo de los datos de configuración
+					settings: {
+						brands: ["VISA", "MSCD", "AMEX", "DINC"],
+						language: "es_PE",
+						businessService: "WEB",
+					},
+					// Seteo de los datos de pago
+					payment: {
+						// Obligatorio
+						channel: "WEB", // Obligatorio - [WEB]
+						paymentOptions: paymentOption, // Obligatorio - ["SYNAPSIS", "IZIPAY", "PAGOEFECTIVO", "KASHIO"] - Al enviar una única opción, se abrirá directamente esa opción de pago
+					},
+				};
+				return transaction;
+			}
+
+			function buildAuthentication(transaction) {
+				var apikey = "aaaaaaa";
+
+				// La secretkey y la generación de la firma deben usarse e implementarse en el servidor del comercio utilizando HMAC SHA512 hex
+				// solo con propósito de demostrar la funcionalidad, se implementa en el ejemplo web
+				// (bajo ninguna circunstancia debe exponerse la secretkey y la generación de la firma desde la web porque compromete la seguridad)
+				var secretkey = "bbbbbbb";
+
+				var timestamp = new Date().toISOString(); // Generar un timestamp actual
+				var payload = {
+					timestamp: timestamp,
+					body: JSON.stringify(transaction),
+				};
+				var payloadStr = JSON.stringify(payload);
+				var signature = CryptoJS.HmacSHA512(payloadStr, secretkey).toString(
+					CryptoJS.enc.Hex
+				);
+
+				// El campo onBehalf es opcional y se usa cuando un comercio agrupa otros sub comercios
+				// la conexión con cada sub comercio se realiza con las credenciales del comercio agrupador
+				// y enviando el identificador del sub comercio en el campo onBehalf
+				// var onBehalf = 'cf747220-b471-4439-9130-d086d4ca83d4';
+
+				// Seteo de identificador del comercio (apikey)
+				// Seteo de firma, que permite verificar la integridad de la transacción
+				// Seteo de onBehalf, que permite identificar las transacciones de los subcomercios
+				// Seteo de timestamp, que permite verificar la integridad de la transacción
+				var authenticator = {
+					"x-api-key": apikey,
+					"x-signature": signature,
+					//"x-onbehalf": onBehalf
+					"x-timestamp": timestamp,
+				};
+
+				return authenticator;
+			}
+		</script>
+	</head>
+	<body>
+		<!-- Overlay (fondo opaco) -->
+		<div class="overlay" onclick="closeLightbox()"></div>
+
+		<!-- Formulario flotante -->
+		<div class="lightbox">
+			<div class="lightbox-header">
+				<h3 style="margin: 0">Datos del pago</h3>
+				<button class="close-btn" onclick="closeLightbox()">&times;</button>
+			</div>
+			<div class="lightbox-content">
+				<div id="cart-container" class="synap-container">
+					<!-- Contenedor donde se apertura el widget de pago -->
+				</div>
+			</div>
+		</div>
+
+		<div class="payment-container">
+			<div class="header">
+				<h1>Checkout de Pago</h1>
+				<p>Selecciona cómo deseas realizar tu pago</p>
+			</div>
+
+			<div class="payment-options">
+				<div class="payment-section">
+					<div class="section-title">
+						<i class="fas fa-credit-card"></i>
+						Tarjetas de Crédito/Débito
+					</div>
+
+					<label class="payment-method">
+						<input type="radio" name="payment-method" value="IZIPAY" />
+						<!-- <div class="logo" style="color: #1a1f71; background-color: #f7f7f7"> -->
+							<!-- <i class="fab fa-cc-visa" style="font-size: 32px"></i> -->
+                            <i class="logo credit-cards-logo"></i>
+						<!-- </div> -->
+						<div class="text-container">
+							<div class="method-name">Tarjetas de crédito / débito</div>
+							<div class="method-description">
+								Paga con tarjeta Visa, Mastercard, Amex o Diners
+							</div>
+						</div>
+					</label>
+				</div>
+
+				<div class="payment-section">
+					<div class="section-title">
+						<i class="fas fa-money-bill-wave"></i>
+						Efectivo
+					</div>
+
+					<label class="payment-method">
+						<input type="radio" name="payment-method" value="PAGOEFECTIVO" />
+						<!-- <div class="logo" style="color: #00bc7d; background-color: #f7f7f7"> -->
+							<!-- <i class="fas fa-dollar-sign" style="font-size: 28px"></i> -->
+                            <i class="logo pagoefectivo-logo"></i>
+						<!-- </div> -->
+						<div class="text-container">
+							<div class="method-name">PagoEfectivo</div>
+							<div class="method-description">
+								Paga en banca móvil, agentes y bodegas
+							</div>
+						</div>
+					</label>
+					<label class="payment-method">
+						<input type="radio" name="payment-method" value="KASHIO" />
+						<!-- <div class="logo" style="color: #00bc7d; background-color: #f7f7f7"> -->
+							<!-- <i class="fas fa-dollar-sign" style="font-size: 28px"></i> -->
+                            <i class="logo kashio-logo"></i>
+						<!-- </div> -->
+						<div class="text-container">
+							<div class="method-name">Kashio</div>
+							<div class="method-description">
+								Paga en banca móvil, agentes y bodegas
+							</div>
+						</div>
+					</label>
+				</div>
+
+				<div class="payment-section">
+					<div class="section-title">
+						<i class="fas fa-mobile-alt"></i>
+						Billetera Digital
+					</div>
+
+					<label class="payment-method">
+						<input type="radio" name="payment-method" value="PAGOEFECTIVO" />
+						<!-- <div class="logo" style="color: #6c5ce7; background-color: #f7f7f7"> -->
+							<!-- <i class="fas fa-wallet" style="font-size: 28px"></i> -->
+                             <i class="logo yape-plin-logo"></i>
+						<!-- </div> -->
+						<div class="text-container">
+							<div class="method-name">QR - Billeteras</div>
+							<div class="method-description">
+								Pago con tu billetera digital Yape, Plin u otra
+							</div>
+						</div>
+					</label>
+				</div>
+
+				<button class="continue-btn">Continuar con el pago</button>
+			</div>
+		</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const paymentMethods = document.querySelectorAll(".payment-method");
+
+				paymentMethods.forEach((method) => {
+					method.addEventListener("click", function () {
+						// Deseleccionar todos los métodos
+						paymentMethods.forEach((m) => m.classList.remove("selected"));
+
+						// Seleccionar el método actual
+						this.classList.add("selected");
+
+						// Marcar el radio button correspondiente
+						const radio = this.querySelector('input[type="radio"]');
+						radio.checked = true;
+					});
+				});
+
+				// Manejar el botón de continuar
+				const continueBtn = document.querySelector(".continue-btn");
+				continueBtn.addEventListener("click", function () {
+					const selectedMethod = document.querySelector(
+						'input[name="payment-method"]:checked'
+					);
+
+					if (!selectedMethod) {
+						alert("Por favor, selecciona un método de pago");
+						return;
+					}
+
+					// alert(`Has seleccionado: ${selectedMethod.value.toUpperCase()}. Redirigiendo al pago...`);
+
+					openLightbox();
+					startPayment();
+					// Aquí iría la lógica para redirigir al procesamiento de pago
+				});
+			});
+		</script>
+
+        <!-- Sección de Tarjetas de Prueba -->
+        <div class="test-cards-section" id="testCardsSection">
+            <div class="toggle-section" id="toggleSection">
+                <h3>💳 Tarjetas de Prueba por Procesador</h3>
+                <span class="toggle-icon">▼</span>
+            </div>
+            
+            <div class="cards-content" id="cardsContent">
+                <!-- Tabs de procesadores -->
+                <div class="processor-tabs" id="processorTabs">
+                    <!-- Los tabs se generan dinámicamente -->
+                </div>
+
+                <!-- Grupos de tarjetas por procesador -->
+                <div class="cards-groups" id="cardsGroups">
+                    <!-- Los grupos se generan dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificación de copiado -->
+        <div class="copy-notification" id="copyNotification">
+            ✅ Número copiado al portapapeles
+        </div>
+
+        <script src="js/test-cards.js"></script>
+
+	</body>
+</html>
