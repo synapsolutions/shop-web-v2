@@ -76,7 +76,7 @@
 					// Seteo del código de moneda
 					currency: "PEN", // Obligatorio - "PEN"
 					//Seteo del monto
-					amount: "1.00", // Obligatorio - float
+					amount: 1, // Obligatorio - float
 					// Seteo del cliente
 					customer: {
 						// Obligatorio
@@ -174,8 +174,8 @@
 							code: "1020304005060", // Opcional - string(200)
 							name: "Llavero", // Obligatorio - string(200)
 							quantity: 1, // Obligatorio - integer
-							unitAmount: 10.1, // Obligatorio - float
-							amount: 10.1, // Obligatorio - float
+							unitAmount: 1, // Obligatorio - float
+							amount: 1, // Obligatorio - float
 						},
 					],
 					// Seteo de los datos de metadata
@@ -185,29 +185,24 @@
 							Factura: "F001-01234", // Obligatorio - key(string): value(string)
 						},
 					],
-					// Seteo de los datos de configuración
-					settings: {
-						brands: ["VISA", "MSCD", "AMEX", "DINC"],
-						language: "es_PE",
-						businessService: "WEB",
-					},
 					// Seteo de los datos de pago
 					payment: {
 						// Obligatorio
 						channel: "WEB", // Obligatorio - [WEB]
-						paymentOptions: paymentOption, // Obligatorio - ["SYNAPSIS", "IZIPAY", "PAGOEFECTIVO", "KASHIO"] - Al enviar una única opción, se abrirá directamente esa opción de pago
+						paymentOptions: paymentOption, // Obligatorio - ["LEGACY", "SYNAPSIS-CARDS", "IZIPAY", "PAGOEFECTIVO", "KASHIO", "SYNAPSIS-QR"] - Al enviar una única opción, se abrirá directamente esa opción de pago
 					},
+					expiresAt: "2026-01-31T23:59:59.999Z", // Opcional - ISO 8601 - por defecto 2 días desde la creación
 				};
 				return transaction;
 			}
 
 			function buildAuthentication(transaction) {
-				var apikey = "aaaaaaa";
+				var apikey = "4d78b7b1-52cd-418b-8532-94cf0a1d514c";
 
 				// La secretkey y la generación de la firma deben usarse e implementarse en el servidor del comercio utilizando HMAC SHA512 hex
 				// solo con propósito de demostrar la funcionalidad, se implementa en el ejemplo web
 				// (bajo ninguna circunstancia debe exponerse la secretkey y la generación de la firma desde la web porque compromete la seguridad)
-				var secretkey = "bbbbbbb";
+                var secretkey = "x#lE6WT*4duyMODG*nIaD#Ma84qeS$ra";
 
 				var timestamp = new Date().toISOString(); // Generar un timestamp actual
 				var payload = {
@@ -270,11 +265,8 @@
 					</div>
 
 					<label class="payment-method">
-						<input type="radio" name="payment-method" value="IZIPAY" />
-						<!-- <div class="logo" style="color: #1a1f71; background-color: #f7f7f7"> -->
-							<!-- <i class="fab fa-cc-visa" style="font-size: 32px"></i> -->
+						<input type="radio" name="payment-method" value="LEGACY" />
                             <i class="logo credit-cards-logo"></i>
-						<!-- </div> -->
 						<div class="text-container">
 							<div class="method-name">Tarjetas de crédito / débito</div>
 							<div class="method-description">
@@ -282,6 +274,17 @@
 							</div>
 						</div>
 					</label>
+
+                    <!-- <label class="payment-method">
+						<input type="radio" name="payment-method" value="SYNAPSIS-CARDS" />
+							<i class="logo credit-cards-logo"></i>
+						<div class="text-container">
+							<div class="method-name">Tarjetas de crédito / débito - OpenPay</div>
+							<div class="method-description">
+								Paga con tarjeta Visa, Mastercard, Amex o Diners
+							</div>
+						</div>
+					</label> -->
 				</div>
 
 				<div class="payment-section">
@@ -325,7 +328,7 @@
 					</div>
 
 					<label class="payment-method">
-						<input type="radio" name="payment-method" value="PAGOEFECTIVO" />
+						<input type="radio" name="payment-method" value="SYNAPSIS-QR" />
 						<!-- <div class="logo" style="color: #6c5ce7; background-color: #f7f7f7"> -->
 							<!-- <i class="fas fa-wallet" style="font-size: 28px"></i> -->
                              <i class="logo yape-plin-logo"></i>
@@ -374,8 +377,10 @@
 					}
 
 					// alert(`Has seleccionado: ${selectedMethod.value.toUpperCase()}. Redirigiendo al pago...`);
-
-					openLightbox();
+					const cardMethods = ['LEGACY', 'SYNAPSIS-CARDS', 'IZIPAY']
+					if (cardMethods.includes(selectedMethod.value)) {
+						openLightbox();
+					}
 					startPayment();
 					// Aquí iría la lógica para redirigir al procesamiento de pago
 				});
